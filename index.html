@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menedżer Projektów</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        nav {
+            background-color: #333;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        nav a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        
+        nav a.active {
+            background-color: #4CAF50;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .active-tab {
+            display: block;
+        }
+        
+        form {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .import-export {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .status-tiles {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .status-tile {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .active-tile {
+            background-color: lightblue;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+        }
+        
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .edit-description {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .file-input-container {
+            margin-bottom: 15px;
+        }
+        
+        .custom-type-container {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .custom-status-container {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Menedżer Projektów</h1>
+        
+        <nav>
+            <a href="#" class="tab-link" data-tab="projects">Projekty</a>
+            <a href="#" class="tab-link" data-tab="add-project">Zarządzaj</a>
+        </nav>
+        
+        <div id="add-project" class="tab-content">
+            <h2>Dodaj nowy projekt</h2>
+            <form id="project-form">
+                <div>
+                    <label for="project-name">Nazwa projektu:</label>
+                    <input type="text" id="project-name" required>
+                </div>
+                
+                <div>
+                    <label for="project-type">Typ projektu:</label>
+                    <select id="project-type" required>
+                        <option value="oryginalny">Oryginalny</option>
+                        <option value="review">Review</option>
+                        <option value="pomysł">Pomysł</option>
+                        <option value="inne">Inne (własny typ)</option>
+                    </select>
+                </div>
+                
+                <div id="custom-type-container" class="custom-type-container">
+                    <label for="custom-type">Własny typ projektu:</label>
+                    <input type="text" id="custom-type">
+                </div>
+                
+                <div id="custom-status-container" class="custom-status-container">
+                    <label for="custom-status">Własne statusy (rozdzielone przecinkami):</label>
+                    <input type="text" id="custom-status" placeholder="np. faza 1, faza 2, faza 3">
+                </div>
+                
+                <div>
+                    <label for="project-description">Dodatkowy opis:</label>
+                    <textarea id="project-description" rows="4"></textarea>
+                </div>
+                
+                <button type="submit">Zapisz</button>
+            </form>
+            
+            <div class="import-export">
+                <h3>Import/Export danych</h3>
+                <div class="file-input-container">
+                    <label for="import-file">Wybierz plik z danymi do importu:</label>
+                    <input type="file" id="import-file" accept=".txt,application/json">
+                </div>
+                <div class="button-group">
+                    <button id="import-btn">Importuj dane</button>
+                    <button id="export-btn">Eksportuj dane</button>
+                    <button id="export-xls-btn">Eksportuj do XLS</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="projects" class="tab-content">
+            <h2>Lista projektów</h2>
+            <table id="projects-table">
+                <thead>
+                    <tr>
+                        <th>Nazwa projektu</th>
+                        <th>Typ</th>
+                        <th>Dodatkowy opis</th>
+                        <th>Status</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody id="projects-body">
+                    <!-- Projekty będą dodawane tutaj dynamicznie -->
+                </tbody>
+            </table>
+            
+            <div class="button-group">
+                <button id="save-projects">Zapisz zmiany</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Zmienne globalne
+        let projects = [];
+        
+        // Kafelki statusu dla różnych typów projektów
+        const statusOptions = {
+            'oryginalny': ['pomysł', 'zbieranie materiału', 'oznaczenia', 'baza danych', 'manuskrypt', 'w recenzji'],
+            'review': ['pomysł', 'początek pisania', 'zaawansowane pisanie', 'manuskrypt', 'w recenzji'],
+            'pomysł': ['pomysł', 'formalności', 'prace zaawansowane']
+        };
+        
+        // Pobieranie elementów DOM
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const projectForm = document.getElementById('project-form');
+        const projectsTable = document.getElementById('projects-table');
+        const projectsBody = document.getElementById('projects-body');
+        const saveProjectsBtn = document.getElementById('save-projects');
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+        const importFile = document.getElementById('import-file');
+        const projectTypeSelect = document.getElementById('project-type');
+        const customTypeContainer = document.getElementById('custom-type-container');
+        const customStatusContainer = document.getElementById('custom-status-container');
+        const customTypeInput = document.getElementById('custom-type');
+        const customStatusInput = document.getElementById('custom-status');
+        const exportXlsBtn = document.getElementById('export-xls-btn');
+        
+        // Funkcja do generowania nazw plików z aktualną datą
+        function getCurrentFormattedDate() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // Miesiące są 0-indexed
+            const year = now.getFullYear();
+            
+            return `${day}.${month}.${year}`;
+        }
+        
+        // Pokaż/ukryj pole niestandardowego typu projektu
+        projectTypeSelect.addEventListener('change', function() {
+            if (this.value === 'inne') {
+                customTypeContainer.style.display = 'block';
+                customStatusContainer.style.display = 'block';
+                customTypeInput.required = true;
+                customStatusInput.required = true;
+            } else {
+                customTypeContainer.style.display = 'none';
+                customStatusContainer.style.display = 'none';
+                customTypeInput.required = false;
+                customStatusInput.required = false;
+            }
+        });
+        
+        // Obsługa zakładek
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Usunięcie klasy active ze wszystkich linków i tabów
+                tabLinks.forEach(l => l.classList.remove('active'));
+                tabContents.forEach(t => t.classList.remove('active-tab'));
+                
+                // Dodanie klasy active do klikniętego linku i odpowiedniego taba
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active-tab');
+            });
+        });
+        
+        // Dodawanie nowego projektu
+        projectForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('project-name').value;
+            let type = document.getElementById('project-type').value;
+            const description = document.getElementById('project-description').value;
+            let customStatusesArray = [];
+            
+            // Obsługa niestandardowego typu
+            if (type === 'inne') {
+                type = document.getElementById('custom-type').value;
+                
+                // Pobranie i przetworzenie niestandardowych statusów
+                customStatusesArray = document.getElementById('custom-status').value
+                    .split(',')
+                    .map(status => status.trim())
+                    .filter(status => status.length > 0);
+                
+                if (customStatusesArray.length > 0) {
+                    statusOptions[type] = [...customStatusesArray]; // Użyj kopii tablicy
+                }
+            }
+            
+            // Dodanie projektu do tablicy
+            const newProject = {
+                id: Date.now(), // Unikalny identyfikator
+                name: name,
+                type: type,
+                description: description,
+                status: [],
+                customType: type === 'inne', // Flaga określająca, czy to niestandardowy typ
+                customStatuses: customStatusesArray // Zapisz niestandardowe statusy w projekcie
+            };
+            
+            projects.push(newProject);
+            
+            // Wyczyszczenie formularza
+            projectForm.reset();
+            customTypeContainer.style.display = 'none';
+            customStatusContainer.style.display = 'none';
+            
+            // Aktualizacja tabeli
+            renderProjects();
+            
+            // Powiadomienie
+            alert('Projekt został dodany!');
+            
+            // Przejście do zakładki Projekty
+            document.querySelector('[data-tab="projects"]').click();
+            
+            // Zapisanie danych
+            saveData();
+        });
+        
+        // Renderowanie projektów w tabeli
+        function renderProjects() {
+            projectsBody.innerHTML = '';
+            
+            projects.forEach(project => {
+                const row = document.createElement('tr');
+                
+                // Kolumna z nazwą
+                const nameCell = document.createElement('td');
+                nameCell.textContent = project.name;
+                row.appendChild(nameCell);
+                
+                // Kolumna z typem
+                const typeCell = document.createElement('td');
+                typeCell.textContent = project.type;
+                row.appendChild(typeCell);
+                
+                // Kolumna z opisem (edytowalnym)
+                const descCell = document.createElement('td');
+                const descInput = document.createElement('textarea');
+                descInput.className = 'edit-description';
+                descInput.value = project.description;
+                descInput.addEventListener('change', function() {
+                    project.description = this.value;
+                });
+                descCell.appendChild(descInput);
+                row.appendChild(descCell);
+                
+                // Kolumna z kafelkami statusu
+                const statusCell = document.createElement('td');
+                const statusTiles = document.createElement('div');
+                statusTiles.className = 'status-tiles';
+                
+                // Wybierz odpowiednie kafelki statusu w zależności od typu projektu
+                let projectStatusOptions = [];
+                
+                // Najpierw sprawdź, czy projekt ma własne niestandardowe statusy
+                if (project.customStatuses && project.customStatuses.length > 0) {
+                    projectStatusOptions = project.customStatuses;
+                    
+                    // Upewnij się, że te statusy są również dostępne w statusOptions
+                    if (!statusOptions[project.type] || !arraysEqual(statusOptions[project.type], project.customStatuses)) {
+                        statusOptions[project.type] = [...project.customStatuses];
+                    }
+                } else {
+                    // Jeśli nie, użyj statusOptions lub pustej tablicy
+                    projectStatusOptions = statusOptions[project.type] || [];
+                }
+                
+                projectStatusOptions.forEach(status => {
+                    const tile = document.createElement('div');
+                    tile.className = 'status-tile';
+                    if (project.status.includes(status)) {
+                        tile.classList.add('active-tile');
+                    }
+                    tile.textContent = status;
+                    tile.addEventListener('click', function() {
+                        this.classList.toggle('active-tile');
+                        
+                        if (this.classList.contains('active-tile')) {
+                            if (!project.status.includes(status)) {
+                                project.status.push(status);
+                            }
+                        } else {
+                            const index = project.status.indexOf(status);
+                            if (index !== -1) {
+                                project.status.splice(index, 1);
+                            }
+                        }
+                    });
+                    statusTiles.appendChild(tile);
+                });
+                
+                statusCell.appendChild(statusTiles);
+                row.appendChild(statusCell);
+                
+                // Kolumna z przyciskiem zakończ projekt
+                const actionCell = document.createElement('td');
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = 'Zakończ projekt';
+                deleteBtn.addEventListener('click', function() {
+                    if (confirm('Czy na pewno chcesz zakończyć ten projekt?')) {
+                        const index = projects.findIndex(p => p.id === project.id);
+                        if (index !== -1) {
+                            projects.splice(index, 1);
+                            renderProjects();
+                            saveData();
+                        }
+                    }
+                });
+                actionCell.appendChild(deleteBtn);
+                row.appendChild(actionCell);
+                
+                projectsBody.appendChild(row);
+            });
+        }
+        
+        // Pomocnicza funkcja do porównywania tablic
+        function arraysEqual(a, b) {
+            if (a === b) return true;
+            if (a == null || b == null) return false;
+            if (a.length !== b.length) return false;
+            
+            for (let i = 0; i < a.length; i++) {
+                if (a[i] !== b[i]) return false;
+            }
+            return true;
+        }
+        
+        // Zapisywanie danych w localStorage
+        function saveData() {
+            const data = JSON.stringify(projects);
+            localStorage.setItem('projects', data);
+            console.log('Dane zapisane w localStorage');
+        }
+        
+        // Eksport danych do pliku
+        function exportData() {
+            const data = JSON.stringify(projects, null, 2); // Dodano wcięcia dla czytelności
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const formattedDate = getCurrentFormattedDate();
+            const filename = `data_${formattedDate}.txt`;
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click(); // Faktyczne wywołanie kliknięcia
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+        
+        // Eksport do pliku XLS
+        function exportToXLS() {
+            // Utwórz tabelę HTML do konwersji na XLS
+            let tableHTML = '<table border="1">';
+            
+            // Nagłówki
+            tableHTML += '<tr>';
+            tableHTML += '<th>Nazwa projektu</th>';
+            tableHTML += '<th>Typ</th>';
+            tableHTML += '<th>Dodatkowy opis</th>';
+            tableHTML += '<th>Status</th>';
+            tableHTML += '</tr>';
+            
+            // Dane
+            projects.forEach(project => {
+                tableHTML += '<tr>';
+                tableHTML += `<td>${project.name}</td>`;
+                tableHTML += `<td>${project.type}</td>`;
+                tableHTML += `<td>${project.description}</td>`;
+                tableHTML += `<td>${project.status.join(', ')}</td>`;
+                tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</table>';
+            
+            // Przygotuj dane do pobrania
+            const blob = new Blob(['<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Projekty</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/></head><body>' + tableHTML + '</body></html>'], {
+                type: 'application/vnd.ms-excel;charset=charset=UTF-8'
+            });
+            
+            const formattedDate = getCurrentFormattedDate();
+            const filename = `projects_${formattedDate}.xls`;
+            
+            // Pobierz plik
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+        
+        // Import danych z pliku
+        function importData(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Proszę wybrać plik do importu!');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        if (confirm('Importowanie danych zastąpi wszystkie istniejące projekty. Czy chcesz kontynuować?')) {
+                            // Załaduj niestandardowe typy i statusy
+                            importedData.forEach(project => {
+                                if (project.customStatuses && project.customStatuses.length > 0) {
+                                    // Utwórz nowy wpis statusOptions dla niestandardowego typu
+                                    statusOptions[project.type] = [...project.customStatuses];
+                                } else if (project.type && !statusOptions[project.type] && project.customType) {
+                                    // Dla wstecznej kompatybilności
+                                    statusOptions[project.type] = project.status || [];
+                                    // Dodajmy customStatuses jeśli nie istnieje
+                                    if (!project.customStatuses) {
+                                        project.customStatuses = project.status || [];
+                                    }
+                                }
+                            });
+                            
+                            projects = importedData;
+                            saveData();
+                            renderProjects();
+                            alert('Dane zostały zaimportowane pomyślnie!');
+                            // Zresetuj input pliku
+                            fileInput.value = '';
+                        }
+                    } else {
+                        alert('Format pliku jest nieprawidłowy. Plik powinien zawierać tablicę projektów.');
+                    }
+                } catch (error) {
+                    alert('Błąd podczas parsowania pliku. Upewnij się, że plik zawiera poprawny format JSON.');
+                    console.error('Błąd importu:', error);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Obsługa przycisku zapisz w zakładce Projekty
+        saveProjectsBtn.addEventListener('click', function() {
+            saveData();
+            alert('Zmiany zostały zapisane!');
+        });
+        
+        // Obsługa eksportu danych
+        exportBtn.addEventListener('click', exportData);
+        
+        // Obsługa eksportu XLS
+        exportXlsBtn.addEventListener('click', exportToXLS);
+        
+        // Obsługa importu danych
+        importBtn.addEventListener('click', function() {
+            importData(importFile);
+        });
+        
+        // Ładowanie danych przy starcie
+        function loadData() {
+            try {
+                const data = localStorage.getItem('projects');
+                if (data) {
+                    projects = JSON.parse(data);
+                    
+                    // Dla wsparcia starszych zapisanych danych - dodaj customStatuses jeśli brakuje
+                    projects.forEach(project => {
+                        if (!project.customStatuses && project.customType) {
+                            project.customStatuses = project.status || [];
+                            if (project.customStatuses.length > 0) {
+                                statusOptions[project.type] = [...project.customStatuses];
+                            }
+                        }
+                    });
+                    
+                    renderProjects();
+                }
+            } catch (error) {
+                console.error('Błąd podczas ładowania danych:', error);
+            }
+        }
+        
+        // Inicjalizacja aplikacji
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            // Domyślnie pokaż zakładkę Projekty
+            document.querySelector('[data-tab="projects"]').click();
+        });
+    </script>
+</body>
+</html>
